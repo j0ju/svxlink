@@ -150,7 +150,7 @@ DnsLookup& DnsLookup::operator=(DnsLookup&& other)
   other.m_label.clear();
 
   m_type = other.m_type;
-  other.m_type = Type::A;
+  other.m_type = Type::AAAA;
 
   *m_worker = std::move(*other.m_worker);
 
@@ -236,7 +236,7 @@ vector<IpAddress> DnsLookup::addresses(void)
   vector<IpAddress> addrs;
   for (const auto& rr : resourceRecordsP())
   {
-    if (rr->type() == Type::A)
+    if (rr->type() == Type::AAAA)
     {
       addrs.push_back(static_cast<const DnsResourceRecordA*>(rr)->ip());
     }

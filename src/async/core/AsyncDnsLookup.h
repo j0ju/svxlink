@@ -135,7 +135,7 @@ class DnsLookup : public sigc::trackable
      * @param 	label The label (e.g. hostname) to lookup
      * @param	type  What kind of resource record to look up
      */
-    DnsLookup(const std::string& label, Type type=Type::A);
+    DnsLookup(const std::string& label, Type type=Type::AAAA);
 
     /**
      * @brief 	Destructor
@@ -160,7 +160,7 @@ class DnsLookup : public sigc::trackable
      * query, the pending query will be aborted.
      * To start a query, the lookup() function need to be called.
      */
-    void setLookupParams(const std::string& label, Type type=Type::A);
+    void setLookupParams(const std::string& label, Type type=Type::AAAA);
 
     /**
      * @brief   Start a DNS lookup
@@ -174,7 +174,7 @@ class DnsLookup : public sigc::trackable
      * query will be aborted.
      * NOTE: This function may emit the resultsReady signal before returning.
      */
-    bool lookup(const std::string& label, Type type=Type::A);
+    bool lookup(const std::string& label, Type type=Type::AAAA);
 
     /**
      * @brief   Start a DNS lookup using previously configured parameters
@@ -342,7 +342,7 @@ class DnsLookup : public sigc::trackable
     typedef std::vector<DnsResourceRecord*> RRListP;
 
     std::string               m_label;
-    Type                      m_type          = Type::A;
+    Type                      m_type          = Type::AAAA;
     DnsLookupWorker*          m_worker        = 0;
     RRList<DnsResourceRecord> m_static_rrs;
 

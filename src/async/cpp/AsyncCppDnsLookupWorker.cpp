@@ -256,6 +256,23 @@ void CppDnsLookupWorker::workerFunc(CppDnsLookupWorker::ThreadContext& ctx)
       }
       break;
     }
+    case DnsLookup::Type::AAAA:
+    {
+      struct addrinfo hints = {0};
+      hints.ai_family = AF_INET6;
+      int ret = getaddrinfo(ctx.label.c_str(), NULL, &hints, &ctx.addrinfo);
+      if (ret != 0)
+      {
+        th_cerr << "*** WARNING[getaddrinfo]: Could not look up host \""
+                << ctx.label << "\": " << gai_strerror(ret) << std::endl;
+      }
+      else if (ctx.addrinfo == nullptr)
+      {
+        th_cerr << "*** WARNING[getaddrinfo]: No address info returned "
+                   "for host \"" << ctx.label << "\"" << std::endl;
+      }
+      break;
+    }
     case DnsLookup::Type::PTR:
     {
       IpAddress ip_addr;
@@ -383,6 +400,31 @@ void CppDnsLookupWorker::notificationReceived(FdWatch *w)
         //          << "  ai_socktype=" << entry->ai_socktype
         //          << "  ai_protocol=" << entry->ai_protocol
         //          << "  ip=" << ip_addr << std::endl;
+        if (find(the_addresses.begin(), the_addresses.end(), ip_addr) ==
+            the_addresses.end())
+        {
+          the_addresses.push_back(ip_addr);
+          addResourceRecord(
+              new DnsResourceRecordA(m_ctx->label, 0, ip_addr));
+        }
+      }
+      m_ctx.reset();
+    }
+  }
+  else if (m_ctx->type == DnsResourceRecord::Type::AAAA)
+  {
+    if (m_ctx->addrinfo != nullptr)
+    {
+      struct addrinfo *entry;
+      std::vector<IpAddress> the_addresses;
+      for (entry = m_ctx->addrinfo; entry != 0; entry = entry->ai_next)
+      {
+        IpAddress ip_addr(
+            reinterpret_cast<struct sockaddr_in*>(entry->ai_addr)->sin_addr);
+        std::cout << "### ai_family=" << entry->ai_family
+                  << "  ai_socktype=" << entry->ai_socktype
+                  << "  ai_protocol=" << entry->ai_protocol
+                  << "  ip=" << ip_addr << std::endl;
         if (find(the_addresses.begin(), the_addresses.end(), ip_addr) ==
             the_addresses.end())
         {

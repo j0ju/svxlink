@@ -125,7 +125,7 @@ class DnsResourceRecord
     /**
      * @brief   The record type
      */
-    enum class Type { ANY, A, PTR, CNAME, SRV };
+    enum class Type { ANY, A, PTR, CNAME, SRV, AAAA };
 
     /**
      * @brief   The record class
@@ -154,7 +154,7 @@ class DnsResourceRecord
     {
       static const std::map<Type, std::string> type_map = {
         {Type::A, "A"}, {Type::PTR, "PTR"}, {Type::CNAME, "CNAME"},
-        {Type::SRV, "SRV"}
+        {Type::SRV, "SRV"}, {Type::AAAA, "AAAA"}
       };
       static const std::string UNKNOWN = "?";
       const auto& it = type_map.find(type);
